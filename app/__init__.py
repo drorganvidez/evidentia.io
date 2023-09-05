@@ -43,13 +43,13 @@ def create_app(config_name=None):
     from app.tests.routes import test_routes
     from .auth import auth_bp
     from .profile import profile_bp
-    from .public import public_bp
+    from .dashboard import dashboard_bp
 
     # Register blueprints
     app.register_blueprint(test_routes)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
-    app.register_blueprint(public_bp)
+    app.register_blueprint(dashboard_bp)
 
     from flask_login import LoginManager
     login_manager = LoginManager()
