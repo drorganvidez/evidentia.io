@@ -19,6 +19,6 @@ RUN pip install --no-cache-dir --upgrade pip
 # Expose port 5000
 EXPOSE 5000
 
-# Run the application
-CMD flask db upgrade && flask run --host=0.0.0.0 --port=5000 --reload --debug
+# Run the migrations, execute populate.py and then start the application
+CMD flask db upgrade && python populate.py && flask run --host=0.0.0.0 --port=5000 --reload --debug
 

@@ -24,6 +24,11 @@ class User(db.Model, UserMixin):
     reviewer = db.relationship('Reviewer', backref='user', uselist=False)
     lectures = db.relationship('Lecturer', backref='user', uselist=False)
 
+    def __init__(self, email, password, **kwargs):
+        super().__init__(**kwargs)
+        self.email = email
+        self.password = generate_password_hash(password)
+
     @property
     def current_roles(self):
         roles = []
@@ -116,6 +121,7 @@ class EventManager(db.Model):
 class Reviewer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
 
 class Lecturer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
