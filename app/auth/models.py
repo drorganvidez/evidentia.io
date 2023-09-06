@@ -15,6 +15,18 @@ class User(db.Model, UserMixin):
 
     profile = db.relationship('UserProfile', backref='user', uselist=False)
 
+    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
+
+    student = db.relationship('Student', backref='user', uselist=False)
+    coordinator = db.relationship('Coordinator', backref='user', uselist=False)
+    secretary = db.relationship('Secretary', backref='user', uselist=False)
+    event_manager = db.relationship('EventManager', backref='user', uselist=False)
+    reviewer = db.relationship('Reviewer', backref='user', uselist=False)
+    lectures = db.relationship('Lecturer', backref='user', uselist=False)
+
+    def get_roles(self):
+        return self.roles
+
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -44,3 +56,50 @@ class User(db.Model, UserMixin):
     @staticmethod
     def get_all():
         return User.query.all()
+
+
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
+
+    VALID_ROLES = ['STUDENT', 'COORDINATOR', 'SECRETARY', 'REVIEWER', 'EVENT_MANAGER', 'LECTURER']
+
+    def __init__(self, name):
+        if name not in self.VALID_ROLES:
+            raise ValueError(f"The role '{name}' is not valid.")
+        self.name = name
+
+
+user_roles = db.Table('user_roles',
+                      db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+                      db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
+                      )
+
+
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+
+class Coordinator(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+
+class Secretary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+
+class EventManager(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+
+class Reviewer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+class Lecturer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)

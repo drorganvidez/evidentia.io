@@ -42,12 +42,14 @@ def create_app(config_name=None):
     # Import blueprints
     from app.tests.routes import test_routes
     from .auth import auth_bp
+    from .file import file_bp
     from .profile import profile_bp
     from .dashboard import dashboard_bp
 
     # Register blueprints
     app.register_blueprint(test_routes)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(file_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)
 
