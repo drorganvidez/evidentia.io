@@ -1,0 +1,53 @@
+{% macro menu_item(root_name, sub_items) %}
+    {% set endpoint_states = {'active': false} %}
+    {% for item in sub_items %}
+        {% if request.endpoint == item.endpoint %}
+            {% set _ = endpoint_states.update({'active': true}) %}
+        {% endif %}
+    {% endfor %}
+    <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
+         data-kt-menu-placement="bottom-start"
+         class="menu-item {{ 'here' if endpoint_states['active'] else '' }} menu-lg-down-accordion menu-sub-lg-down-indention me-0 me-lg-2">
+        <span class="menu-link py-3">
+            <span class="menu-title">{{ root_name }}</span>
+            <span class="menu-arrow d-lg-none"></span>
+        </span>
+        <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown px-lg-2 py-lg-4 w-lg-250px">
+            {% for sub in sub_items %}
+            <div class="menu-item">
+                <a class="menu-link {{ 'active' if request.endpoint == sub.endpoint else '' }} py-3" href="{{ url_for(sub.endpoint) }}">
+                <span class="menu-icon">
+                    <i class="{{ sub.icon }}">
+                     <i class="path1"></i>
+                     <i class="path2"></i>
+                     <i class="path3"></i>
+                    </i>
+                </span>
+                    <span class="menu-title">{{ sub.name }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro horizontal_menu(nav_items) %}
+    <div id="kt_user_profile_nav" class="rounded bg-gray-200 d-flex flex-stack flex-wrap mb-9 p-2" data-kt-sticky="true"
+         data-kt-sticky-name="sticky-profile-navs" data-kt-sticky-offset="{default: false, lg: '400px'}"
+         data-kt-sticky-width="{target: '#kt_user_profile_panel'}" data-kt-sticky-left="auto" data-kt-sticky-top="70px"
+         data-kt-sticky-animation="true" data-kt-sticky-zindex="95">
+
+        <!--begin::Nav-->
+        <ul class="nav flex-wrap border-transparent">
+            {% for item in nav_items %}
+            <!--begin::Nav item-->
+            <li class="nav-item my-1">
+                <a class="btn btn-sm btn-color-gray-600 bg-state-body btn-active-color-gray-800 fw-bolder fw-bold fs-6 fs-lg-base nav-link px-3 px-lg-4 mx-1 {{ 'active' if request.endpoint == item.endpoint else '' }}"
+                   href="{{ url_for(item.endpoint) }}">{{ item.name }}</a>
+            </li>
+            <!--end::Nav item-->
+            {% endfor %}
+        </ul>
+        <!--end::Nav-->
+    </div>
+{% endmacro %}

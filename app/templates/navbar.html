@@ -6,14 +6,14 @@
         <div class="text-end d-none d-sm-flex flex-column justify-content-center me-3">
             <a href="../../demo9/dist/pages/user-profile/overview.html"
                class="text-white text-hover-primary fs-6 fw-bold">{{ current_user.profile.name }}</a>
-            <span class="text-gray-600 fs-7 fw-semibold d-block">Hexagon.click</span>
+            <span class="text-gray-600 fs-7 fw-semibold d-block">{{ current_user.email }}</span>
         </div>
         <!--end:Info-->
         <!--begin::Menu wrapper-->
         <div class="cursor-pointer symbol symbol-35px symbol-md-40px"
              data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent"
              data-kt-menu-placement="bottom-end">
-            <img src="{{ url_for("static", filename="media/avatars/300-9.jpg") }}" alt="user"/>
+            <img src="{{ url_for("static", filename="media/avatars/blank.png") }}" alt="user"/>
         </div>
         <!--begin::User account menu-->
         <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px"
@@ -23,7 +23,7 @@
                 <div class="menu-content d-flex align-items-center px-3">
                     <!--begin::Avatar-->
                     <div class="symbol symbol-50px me-5">
-                        <img alt="Logo" src="{{ url_for("static", filename="media/avatars/300-9.jpg") }}"/>
+                        <img alt="Logo" src="{{ url_for("static", filename="media/avatars/blank.png") }}"/>
                     </div>
                     <!--end::Avatar-->
                     <!--begin::Username-->

@@ -39,19 +39,21 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Import blueprints
+    # Import blueprints (please do not delete this comment)
     from app.tests.routes import test_routes
     from .auth import auth_bp
     from .file import file_bp
     from .profile import profile_bp
     from .dashboard import dashboard_bp
+    from .lecturer import lecturer_bp
 
-    # Register blueprints
+    # Register blueprints (please do not delete this comment)
     app.register_blueprint(test_routes)
     app.register_blueprint(auth_bp)
     app.register_blueprint(file_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(lecturer_bp)
 
     from flask_login import LoginManager
     login_manager = LoginManager()
@@ -70,10 +72,27 @@ def create_app(config_name=None):
     # Custom error handlers
     register_error_handlers(app)
 
-    # Injecting FLASK_APP_NAME environment variable into jinja context
+    # Injecting FLASK_APP_NAME environment variable into jinja templates
     @app.context_processor
     def inject_flask_app_name():
         return dict(FLASK_APP_NAME=os.getenv('FLASK_APP_NAME'))
+
+    # Injecting roles into jinja templates
+    @app.context_processor
+    def inject_user_roles():
+        if not current_user.is_authenticated:
+            return {}
+
+        roles = [role.name for role in current_user.roles]
+
+        return {
+            'is_student': 'STUDENT' in roles,
+            'is_coordinator': 'COORDINATOR' in roles,
+            'is_secretary': 'SECRETARY' in roles,
+            'is_reviewer': 'REVIEWER' in roles,
+            'is_event_manager': 'EVENT_MANAGER' in roles,
+            'is_lecturer': 'LECTURER' in roles
+        }
 
     return app
 

@@ -78,3 +78,14 @@ chmod +x update_dependencies.sh && ./update_dependencies.sh
 ```
 
 Note: it is the responsibility of the developer to check that the update of the dependencies has not broken any functionality and each dependency maintains backwards compatibility. Use the script with care!
+
+## Add new module
+
+To add a new module or functionality to the project, an automatic script is provided:
+
+```
+python new_module.py
+```
+
+This will create a folder in `app` with the name of the module and a file and directory structure according to the project.
+
