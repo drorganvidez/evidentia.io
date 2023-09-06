@@ -24,6 +24,23 @@ class User(db.Model, UserMixin):
     reviewer = db.relationship('Reviewer', backref='user', uselist=False)
     lectures = db.relationship('Lecturer', backref='user', uselist=False)
 
+    @property
+    def current_roles(self):
+        roles = []
+
+        if self.student:
+            roles.append("Student")
+        if self.coordinator:
+            roles.append("Coordinator")
+        if self.secretary:
+            roles.append("Secretary")
+        if self.event_manager:
+            roles.append("EventManager")
+        if self.reviewer:
+            roles.append("Reviewer")
+
+        return roles
+
     def get_roles(self):
         return self.roles
 
