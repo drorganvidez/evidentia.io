@@ -4,6 +4,7 @@ from flask import render_template
 from flask_login import login_required
 
 from . import lecturer_bp
+from ..auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,9 @@ logger = logging.getLogger(__name__)
 def users_manage():
     logger.info('Access lecturer index')
 
-    return render_template("lecturer/users/manage.html")
+    users = User.query.all()
+    data_collection = [{'Email': user.email} for user in users]
+    return render_template('lecturer/users/manage.html', data_collection=data_collection)
 
 
 @lecturer_bp.route("/lecturer/users/roles")
@@ -21,4 +24,4 @@ def users_manage():
 def users_roles():
     logger.info('Access lecturer index')
 
-    return render_template("lecturer/users/manage.html")
+    return render_template("lecturer/users/roles.html")

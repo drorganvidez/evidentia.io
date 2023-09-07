@@ -26,6 +26,8 @@
     <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
     <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="plugins/global/plugins.bundle.css") }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="css/style.bundle.css") }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="plugins/custom/datatables/datatables.bundle.css") }}">
     <!--end::Global Stylesheets Bundle-->
     <script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
 </head>
@@ -34,8 +36,8 @@
 <body id="kt_body" data-kt-app-header-stacked="true" data-kt-app-header-primary-enabled="true"
       data-kt-app-header-secondary-enabled="true" class="app-default">
 <!--begin::Theme mode setup on page load-->
-<script>var defaultThemeMode = "light";
-var themeMode;
+<script>let defaultThemeMode = "light";
+let themeMode;
 if (document.documentElement) {
     if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
         themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
@@ -60,7 +62,6 @@ if (document.documentElement) {
         {% include 'header.html' %}
 
 
-
         <!--begin::Wrapper-->
         <div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
             <!--begin::Wrapper container-->
@@ -70,8 +71,26 @@ if (document.documentElement) {
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column flex-column-fluid">
 
-                        {% block horizontal_menu %}{% endblock %}
-                        {% block content %}{% endblock %}
+                        <div id="kt_app_content" class="app-content flex-column-fluid">
+                            {% block horizontal_menu %}{% endblock %}
+                            {% block content %}{% endblock %}
+                        </div>
+
+                        <style>
+                            /* Por defecto, el div no tendrá padding */
+                            #kt_app_content {
+                                padding: 0;
+                            }
+
+                            /* Cuando la pantalla tenga un ancho máximo de 768px (es decir, en dispositivos móviles),
+                               puedes agregar el padding que desees */
+                            @media (max-width: 768px) {
+                                #kt_app_content {
+                                    padding-top: 10px; /* Cambia esto según el padding que quieras para móviles */
+                                }
+                            }
+                        </style>
+
 
                     </div>
                     <!--end::Content wrapper-->
@@ -95,14 +114,18 @@ if (document.documentElement) {
         <span class="path2"></span>
     </i>
 </div>
-<!--end::Scrolltop-->
-<!--begin::Javascript-->
-<script>var hostUrl = "assets/";</script>
-<!--begin::Global Javascript Bundle(mandatory for all pages)-->
+
 <script src="{{ url_for("static", filename="plugins/global/plugins.bundle.js") }}"></script>
 <script src="{{ url_for("static", filename="js/scripts.bundle.js") }}"></script>
-<!--end::Global Javascript Bundle-->
-<!--end::Javascript-->
+
+{% block scripts %}{% endblock %}
+
+{% block scripts_datatables %}{% endblock %}
+
+
+
+
+
 </body>
-<!--end::Body-->
+
 </html>

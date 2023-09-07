@@ -1,10 +1,14 @@
 {% extends "lecturer/users/root.html" %}
 
+{% import 'macros.html' as macros %}
+
 {% block title %}lecturer{% endblock %}
 
 {% block content %}
 
-    Hello
+{% set columns = ["Email"] %}
 
+{{ macros.render_table(columns, data_collection) }}
 
 {% endblock %}
+
