@@ -46,6 +46,7 @@ def create_app(config_name=None):
     from .profile import profile_bp
     from .dashboard import dashboard_bp
     from .lecturer import lecturer_bp
+    from .student import student_bp
 
     # Register blueprints (please do not delete this comment)
     app.register_blueprint(test_routes)
@@ -54,6 +55,7 @@ def create_app(config_name=None):
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(lecturer_bp)
+    app.register_blueprint(student_bp)
 
     from flask_login import LoginManager
     login_manager = LoginManager()

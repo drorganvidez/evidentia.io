@@ -6,8 +6,8 @@
 
 {% block content %}
 
-{% set columns = ["Email"] %}
-{% set buttons = [
+    {% set columns = ["Email"] %}
+    {% set buttons = [
     {
         'name': 'Importar alumnos',
         'form_action': '/route1',
@@ -25,7 +25,14 @@
 
 ] %}
 
-{{ macros.render_table(columns, data_collection, buttons) }}
+    {% set menu_routes = {
+        "view": 'student.view',
+        "edit": "student.edit",
+        "delete": "student.delete"
+        }
+    %}
+
+    {{ macros.render_table(columns, data_collection, buttons, menu_routes) }}
 
 
 {% endblock %}

@@ -13,16 +13,16 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    profile = db.relationship('UserProfile', backref='user', uselist=False)
+    profile = db.relationship('UserProfile', backref='user', lazy=True, cascade="all, delete-orphan")
 
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
 
-    student = db.relationship('Student', backref='user', uselist=False)
-    coordinator = db.relationship('Coordinator', backref='user', uselist=False)
-    secretary = db.relationship('Secretary', backref='user', uselist=False)
-    event_manager = db.relationship('EventManager', backref='user', uselist=False)
-    reviewer = db.relationship('Reviewer', backref='user', uselist=False)
-    lectures = db.relationship('Lecturer', backref='user', uselist=False)
+    student = db.relationship('Student', backref='user', uselist=False, cascade="all, delete-orphan")
+    coordinator = db.relationship('Coordinator', backref='user', uselist=False, cascade="all, delete-orphan")
+    secretary = db.relationship('Secretary', backref='user', uselist=False, cascade="all, delete-orphan")
+    event_manager = db.relationship('EventManager', backref='user', uselist=False, cascade="all, delete-orphan")
+    reviewer = db.relationship('Reviewer', backref='user', uselist=False, cascade="all, delete-orphan")
+    lectures = db.relationship('Lecturer', backref='user', uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, email, password, **kwargs):
         super().__init__(**kwargs)

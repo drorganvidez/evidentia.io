@@ -24,7 +24,7 @@ var KTCustomersList = function () {
             "info": false,
             'order': [],
             'columnDefs': [
-                { orderable: false, targets: 0 }, // Disable ordering on column 0 (checkbox)
+                {orderable: false, targets: 0}, // Disable ordering on column 0 (checkbox)
 
             ]
         });
@@ -95,6 +95,14 @@ var KTCustomersList = function () {
                 // Get customer name
                 const customerName = parent.querySelectorAll('td')[1].innerText;
 
+                // Get delete route
+                const deleteRoute = e.target.getAttribute("data-kt-delete-route");
+                console.log(deleteRoute)
+
+                // Get delete id
+                const deleteId = e.target.getAttribute("data-kt-delete-id");
+                console.log(deleteId)
+
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
                     text: "¿Estás seguro/a que deseas eliminar " + customerName + "?",
@@ -109,29 +117,47 @@ var KTCustomersList = function () {
                     }
                 }).then(function (result) {
                     if (result.value) {
-                        Swal.fire({
-                            text: "Has borrado " + customerName + ".",
-                            icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "¡De acuerdo!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        }).then(function () {
-                            // Remove current row
-                            datatable.row($(parent)).remove().draw();
-                        });
-                    } else if (result.dismiss === 'cancel') {
-                        Swal.fire({
-                            text: customerName + " no fue eliminado.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        });
+                        fetch(deleteRoute, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'id=' + deleteId
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+
+                                Swal.fire({
+                                    text: "Has borrado " + customerName + ".",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "¡De acuerdo!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-primary",
+                                    }
+                                }).then(function () {
+                                    datatable.row($(parent)).remove().draw();
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire({
+                                    text: "Ocurrió un error al intentar borrar " + customerName + ".",
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Entendido",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-danger",
+                                    }
+                                });
+                            });
                     }
+
                 });
             })
         });
