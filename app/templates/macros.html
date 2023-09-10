@@ -65,7 +65,7 @@
 
 {% endmacro %}
 
-{% macro render_table(columns, data_collection) %}
+{% macro render_table(columns, data_collection, buttons_config=[]) %}
 
     <div class="card">
 
@@ -79,7 +79,7 @@
                         <span class="path2"></span>
                     </i>
                     <input type="text" data-kt-customer-table-filter="search"
-                           class="form-control form-control-solid w-250px ps-12" placeholder="Search Customers"/>
+                           class="form-control form-control-solid w-250px ps-12" placeholder="Buscar"/>
                 </div>
 
             </div>
@@ -181,19 +181,56 @@
 
                     </div>
 
+                    {% for btn in buttons_config %}
 
-                    <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
-                            data-bs-target="#kt_customers_export_modal">
-                        <i class="ki-duotone ki-exit-up fs-2">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>Export
-                    </button>
+                        {% set modal_id = 'custom_modal_' ~ loop.index %}  {# Generamos el ID del modal #}
+                        <button type="button" class="btn btn-primary {% if not loop.last %}me-2{% endif %}"
+                                data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
+                            {{ btn.name }}
+                        </button>
 
+                        <div class="modal fade kt_modal" id="{{ modal_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered mw-650px">
+                                <div class="modal-content">
+                                    <form class="form {{ btn.form_class }}" action="{{ btn.form_action }}"
+                                          id="{{ btn.form_id }}" method="post"
+                                            {% if btn.is_multipart %} enctype="multipart/form-data" {% endif %}>
 
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#kt_modal_add_customer">Add Customer
-                    </button>
+                                        <div class="modal-header" id="{{ btn.modal_id }}_header">
+                                            <h2 class="fw-bold">{{ btn.header_title }}</h2>
+                                            <div onclick="close_modal()"
+                                                 class="btn btn-icon btn-sm btn-active-icon-primary">
+                                                <i class="ki-duotone ki-cross fs-1">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </div>
+                                        </div>
+                                        <div class="modal-body py-10 px-lg-17">
+                                            <div class="scroll-y me-n7 pe-7" id="{{ btn.modal_id }}_scroll"
+                                                 data-kt-scroll="true"
+                                                 data-kt-scroll-activate="{default: false, lg: true}"
+                                                 data-kt-scroll-max-height="auto"
+                                                 data-kt-scroll-dependencies="#{{ btn.modal_id }}_header"
+                                                 data-kt-scroll-wrappers="#{{ btn.modal_id }}_scroll"
+                                                 data-kt-scroll-offset="300px">
+                                                {{ btn.form_body|safe }}
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer flex-center">
+                                            <button type="reset" onclick="close_modal()"
+                                                    class="btn btn-light me-3 kt_modal_cancel" data-mdb-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="submit" class="btn btn-primary kt_modal_submit">
+                                                <span class="indicator-label">Enviar</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
 
                 </div>
 
@@ -201,7 +238,7 @@
                 <div class="d-flex justify-content-end align-items-center d-none"
                      data-kt-customer-table-toolbar="selected">
                     <div class="fw-bold me-5">
-                        <span class="me-2" data-kt-customer-table-select="selected_count"></span>Selected
+                        <span class="me-2" data-kt-customer-table-select="selected_count"></span>seleccionados
                     </div>
                     <button type="button" class="btn btn-danger" data-kt-customer-table-select="delete_selected">Delete
                         Selected
@@ -274,214 +311,29 @@
 
     </div>
 
-
-
-    <div class="modal fade" id="kt_modal_add_customer" tabindex="-1" aria-hidden="true">
-
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-
-            <div class="modal-content">
-
-                <form class="form" action="#" id="kt_modal_add_customer_form"
-                      data-kt-redirect="../../demo9/dist/apps/customers/list.html">
-
-                    <div class="modal-header" id="kt_modal_add_customer_header">
-
-                        <h2 class="fw-bold">Add a Customer</h2>
-
-
-                        <div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary">
-                            <i class="ki-duotone ki-cross fs-1">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                        </div>
-
-                    </div>
-
-
-                    <div class="modal-body py-10 px-lg-17">
-
-                        <div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true"
-                             data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto"
-                             data-kt-scroll-dependencies="#kt_modal_add_customer_header"
-                             data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
-
-                            <div class="fv-row mb-7">
-
-                                <label class="required fs-6 fw-semibold mb-2">Name</label>
-
-
-                                <input type="text" class="form-control form-control-solid" placeholder="" name="name"
-                                       value="Sean Bean"/>
-
-                            </div>
-
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="modal-footer flex-center">
-
-                        <button type="reset" id="kt_modal_add_customer_cancel" class="btn btn-light me-3">Discard
-                        </button>
-
-
-                        <button type="submit" id="kt_modal_add_customer_submit" class="btn btn-primary">
-                            <span class="indicator-label">Submit</span>
-                            <span class="indicator-progress">Please wait...
-															<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade" id="kt_customers_export_modal" tabindex="-1" aria-hidden="true">
-
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <h2 class="fw-bold">Export Customers</h2>
-
-
-                    <div id="kt_customers_export_close" class="btn btn-icon btn-sm btn-active-icon-primary">
-                        <i class="ki-duotone ki-cross fs-1">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>
-                    </div>
-
-                </div>
-
-
-                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
-
-                    <form id="kt_customers_export_form" class="form" action="#">
-
-                        <div class="fv-row mb-10">
-
-                            <label class="fs-5 fw-semibold form-label mb-5">Select Export Format:</label>
-
-
-                            <select data-control="select2" data-placeholder="Select a format" data-hide-search="true"
-                                    name="format" class="form-select form-select-solid">
-                                <option value="excell">Excel</option>
-                                <option value="pdf">PDF</option>
-                                <option value="cvs">CVS</option>
-                                <option value="zip">ZIP</option>
-                            </select>
-
-                        </div>
-
-
-                        <div class="fv-row mb-10">
-
-                            <label class="fs-5 fw-semibold form-label mb-5">Select Date Range:</label>
-
-
-                            <input class="form-control form-control-solid" placeholder="Pick a date" name="date"/>
-
-                        </div>
-
-
-                        <div class="row fv-row mb-15">
-
-                            <label class="fs-5 fw-semibold form-label mb-5">Payment Type:</label>
-
-
-                            <div class="d-flex flex-column">
-
-                                <label class="form-check form-check-custom form-check-sm form-check-solid mb-3">
-                                    <input class="form-check-input" type="checkbox" value="1" checked="checked"
-                                           name="payment_type"/>
-                                    <span class="form-check-label text-gray-600 fw-semibold">All</span>
-                                </label>
-
-
-                                <label class="form-check form-check-custom form-check-sm form-check-solid mb-3">
-                                    <input class="form-check-input" type="checkbox" value="2" checked="checked"
-                                           name="payment_type"/>
-                                    <span class="form-check-label text-gray-600 fw-semibold">Visa</span>
-                                </label>
-
-
-                                <label class="form-check form-check-custom form-check-sm form-check-solid mb-3">
-                                    <input class="form-check-input" type="checkbox" value="3" name="payment_type"/>
-                                    <span class="form-check-label text-gray-600 fw-semibold">Mastercard</span>
-                                </label>
-
-
-                                <label class="form-check form-check-custom form-check-sm form-check-solid">
-                                    <input class="form-check-input" type="checkbox" value="4" name="payment_type"/>
-                                    <span class="form-check-label text-gray-600 fw-semibold">American Express</span>
-                                </label>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="text-center">
-                            <button type="reset" id="kt_customers_export_cancel" class="btn btn-light me-3">Discard
-                            </button>
-                            <button type="submit" id="kt_customers_export_submit" class="btn btn-primary">
-                                <span class="indicator-label">Submit</span>
-                                <span class="indicator-progress">Please wait...
-																<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                            </button>
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
     {% block scripts_datatables %}
-    <script>
-        function loadScript(src) {
-            return new Promise(function(resolve, reject) {
-                let script = document.createElement('script');
-                script.src = src;
+        <script>
+            function loadScript(src) {
+                return new Promise(function (resolve, reject) {
+                    let script = document.createElement('script');
+                    script.src = src;
 
-                script.onload = () => resolve(script);
-                script.onerror = () => reject(new Error(`Error al cargar el script ${src}`));
+                    script.onload = () => resolve(script);
+                    script.onerror = () => reject(new Error(`Error al cargar el script ${src}`));
 
-                document.body.appendChild(script);
+                    document.body.appendChild(script);
+                });
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                loadScript("{{ url_for('static', filename='plugins/custom/datatables/datatables.bundle.js') }}")
+                    .then(() => loadScript("{{ url_for('static', filename='js/datatables.js') }}"))
+                    .then(() => loadScript("{{ url_for('static', filename='js/widgets.bundle.js') }}"))
+                    .then(() => loadScript("{{ url_for('static', filename='js/modal_forms.js') }}"))
+                    .catch(error => console.error(error));
             });
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            loadScript("{{ url_for('static', filename='plugins/custom/datatables/datatables.bundle.js') }}")
-            .then(() => loadScript("{{ url_for('static', filename='js/custom/apps/customers/list/export.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/datatables.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/custom/apps/customers/add.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/widgets.bundle.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/custom/apps/chat/chat.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/custom/utilities/modals/create-campaign.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/custom/utilities/modals/create-app.js') }}"))
-            .then(() => loadScript("{{ url_for('static', filename='js/custom/utilities/modals/users-search.js') }}"))
-            .catch(error => console.error(error));
-        });
-    </script>
-{% endblock %}
+        </script>
+    {% endblock %}
 
 
 

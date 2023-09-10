@@ -97,12 +97,12 @@ var KTCustomersList = function () {
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
-                    text: "Are you sure you want to delete " + customerName + "?",
+                    text: "¿Estás seguro/a que deseas eliminar " + customerName + "?",
                     icon: "warning",
                     showCancelButton: true,
                     buttonsStyling: false,
-                    confirmButtonText: "Yes, delete!",
-                    cancelButtonText: "No, cancel",
+                    confirmButtonText: "¡Sí, eliminar!",
+                    cancelButtonText: "No, cancelar",
                     customClass: {
                         confirmButton: "btn fw-bold btn-danger",
                         cancelButton: "btn fw-bold btn-active-light-primary"
@@ -110,10 +110,10 @@ var KTCustomersList = function () {
                 }).then(function (result) {
                     if (result.value) {
                         Swal.fire({
-                            text: "You have deleted " + customerName + "!.",
+                            text: "Has borrado " + customerName + ".",
                             icon: "success",
                             buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
+                            confirmButtonText: "¡De acuerdo!",
                             customClass: {
                                 confirmButton: "btn fw-bold btn-primary",
                             }
@@ -123,7 +123,7 @@ var KTCustomersList = function () {
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
-                            text: customerName + " was not deleted.",
+                            text: customerName + " no fue eliminado.",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
