@@ -3,6 +3,7 @@ version: '3.8'
 services:
 
   web:
+    container_name: web_container
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -16,6 +17,7 @@ services:
       - db
 
   nginx:
+    container_name: nginx_container
     image: nginx:latest
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
@@ -23,6 +25,7 @@ services:
       - "80:80"
 
   db:
+    container_name: db_container
     image: mysql:latest
     command: --default-authentication-plugin=mysql_native_password
     restart: always
