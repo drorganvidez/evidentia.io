@@ -33,9 +33,8 @@ def add_roles_and_lecturers_and_students():
     session.commit()
 
     lecturer_role = session.query(Role).filter_by(name="LECTURER").first()
-    student_role = session.query(Role).filter_by(name="STUDENT").first()  # Obteniendo el rol de STUDENT
+    student_role = session.query(Role).filter_by(name="STUDENT").first()
 
-    # Creando profesores
     user1 = User(email="profesor1@profesor1.com", password="profesor1")
     profile1 = UserProfile(name="Profesor", surname="Uno", dni="12345678X", user=user1)
     user1.roles.append(lecturer_role)
@@ -49,13 +48,12 @@ def add_roles_and_lecturers_and_students():
     session.add(user1)
     session.add(user2)
 
-    # Creando estudiantes
     alumno1 = User(email="alumno1@alumno1.com", password="alumno1")
     student_profile1 = UserProfile(name="Alumno", surname="Uno", dni="11112222A", user=alumno1)
     alumno1.roles.append(student_role)
 
     alumno2 = User(email="alumno2@alumno2.com", password="alumno2")
-    student_profile2 = UserProfile(name="Student", surname="Two", dni="22221111B", user=alumno2)
+    student_profile2 = UserProfile(name="Alumno", surname="Dos", dni="22221111B", user=alumno2)
     alumno2.roles.append(student_role)
 
     session.add(alumno1)

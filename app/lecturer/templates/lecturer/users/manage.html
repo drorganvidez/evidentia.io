@@ -6,9 +6,9 @@
 
 {% block content %}
 
-    {% set columns = ["Email"] %}
-    {% set buttons = [
-    {
+    {% set columns = ["Email", "Apellidos", "Nombre"] %}
+
+    {% set buttons = [{
         'name': 'Importar alumnos',
         'form_action': '/route1',
         'form_class': 'kt_modal_form',
@@ -22,8 +22,7 @@
             </div>
         '''
     },
-
-] %}
+    ] %}
 
     {% set menu_routes = {
         "view": 'student.view',

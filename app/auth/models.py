@@ -13,7 +13,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    profile = db.relationship('UserProfile', backref='user', lazy=True, cascade="all, delete-orphan")
+    profile = db.relationship('UserProfile', backref='user', lazy=True, uselist=False, cascade="all, delete-orphan")
 
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
 
@@ -28,6 +28,12 @@ class User(db.Model, UserMixin):
         super().__init__(**kwargs)
         self.email = email
         self.password = generate_password_hash(password)
+
+    def name(self):
+        return self.profile.name if self.profile else None
+
+    def surname(self):
+        return self.profile.surname if self.profile else None
 
     @property
     def current_roles(self):

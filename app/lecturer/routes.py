@@ -24,7 +24,13 @@ def users_manage():
 
     users = User.query.filter(User.id.notin_(lecturer_users_ids)).all()
 
-    data_collection = [{'id': user.id, 'Email': user.email} for user in users]
+    data_collection = [{
+        'id': user.id,
+        'Email': user.email,
+        'Apellidos': user.surname(),
+        'Nombre': user.name()
+    } for user in users]
+
     return render_template('lecturer/users/manage.html', data_collection=data_collection)
 
 
