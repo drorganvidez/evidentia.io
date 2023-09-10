@@ -330,9 +330,10 @@ var KTCustomersList = function () {
             initCustomerList();
             initToggleToolbar();
             handleSearchDatatable();
-            handleFilterDatatable();
+            // handleFilterDatatable(); POR EL AMOR DE DIOS, ACUÉRDATE DE DESCOMENTAR ESTO ANTES DE PROGRAMAR LOS FILTROS
+            // handleResetForm();
             handleDeleteRows();
-            handleResetForm();
+
         }
     }
 }();
