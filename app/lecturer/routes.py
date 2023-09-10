@@ -1,10 +1,11 @@
 import logging
 
 import pandas as pd
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required
 
 from . import lecturer_bp
+from .services import get_all_students
 from .. import db
 from ..auth.models import User, Role, user_roles
 from ..profile.models import UserProfile
@@ -17,14 +18,7 @@ logger = logging.getLogger(__name__)
 def users_manage():
     logger.info('Access lecturer index')
 
-    lecturer_role = Role.query.filter_by(name="LECTURER").first()
-    if not lecturer_role:
-        return "Role LECTURER not found", 500
-
-    lecturer_users_ids = [user_role.user_id for user_role in
-                          db.session.query(user_roles.c.user_id).filter(user_roles.c.role_id == lecturer_role.id).all()]
-
-    users = User.query.filter(User.id.notin_(lecturer_users_ids)).all()
+    users = get_all_students()
 
     data_collection = [{
         'id': user.id,
@@ -47,49 +41,79 @@ def users_roles():
 @lecturer_bp.route("/lecturer/users/upload", methods=['POST'])
 @login_required
 def upload_excel():
-    # Verifica si se envió un archivo en la solicitud POST
     if 'file' not in request.files:
-        return jsonify({'message': 'No se encontró un archivo Excel en la solicitud'}), 400
+        flash(f'No se encontró un archivo Excel en la solicitud', 'error')
+        return redirect(url_for('lecturer.users_manage'))
 
     file = request.files['file']
 
-    # Verifica si el archivo tiene una extensión válida (por ejemplo, .xls o .xlsx)
     if file.filename == '' or not file.filename.endswith(('.xls', '.xlsx')):
-        return jsonify({'message': 'Formato de archivo no válido'}), 400
+        flash(f'Formato de archivo no válido', 'error')
+        return redirect(url_for('lecturer.users_manage'))
 
     try:
-        # Carga el archivo Excel en un DataFrame de pandas
         df = pd.read_excel(file)
     except Exception as e:
-        return jsonify({'message': 'Error al leer el archivo Excel'}), 500
+        flash(f'Error al leer el archivo Excel, {str(e)}', 'error')
+        return redirect(url_for('lecturer.users_manage'))
 
-    # Itera a través de las filas del DataFrame y crea usuarios
+    # Definición de encabezados conocidos
+    column_headers = ['DNI', 'UVUS', 'NOMBRE', 'APELLIDOS', 'EMAIL']
+
+    # Diccionario para mapear los nombres de las columnas a los campos del modelo de datos
+    column_mapping = {
+        'DNI': 'dni',
+        'UVUS': 'username',
+        'NOMBRE': 'nombre',
+        'APELLIDOS': 'apellidos',
+        'EMAIL': 'email'
+    }
+
     for index, row in df.iterrows():
-        dni = str(row['DNI'])
-        nombre = row['NOMBRE']
-        apellido = row['APELLIDOS']
-        email = row['EMAIL']
-        curso = row['CURSO']
+        user_data = {}
 
-        # Evita crear usuarios con datos vacíos o duplicados
-        if dni and nombre and apellido and email and curso:
-            # Verifica si ya existe un usuario con el mismo correo electrónico
-            existing_user = User.query.filter_by(email=email).first()
-            if existing_user:
+        # Itera a través de las columnas del DataFrame y mapea los datos al modelo de datos
+        for header in column_headers:
+            column_name = column_mapping.get(header, None)
+            if column_name is not None:
+                user_data[column_name] = str(row.get(header, '')).strip()  # Elimina espacios en blanco al principio y al final
+
+        # Si los nombres y apellidos están en una sola columna, divídelos por la coma
+        full_name = user_data.get('apellidos', '')
+        if ',' in full_name:
+            last_name, first_name = full_name.split(',', 1)
+            user_data['nombre'] = first_name.strip()
+            user_data['apellidos'] = last_name.strip()
+
+        # Crea un nuevo usuario solo si se proporciona al menos un campo válido
+        if any(user_data.values()):
+            existing_user_email = User.query.filter_by(email=user_data['email']).first()
+            existing_user_dni = UserProfile.query.filter_by(dni=user_data['dni']).first()
+            existing_user_username = User.query.filter_by(username=user_data['username']).first()
+
+            if existing_user_email or existing_user_dni or existing_user_username:
                 continue
 
-            # Crea un nuevo usuario y perfil
-            new_user = User(email=email, password="tu_contraseña")  # Cambia "tu_contraseña" por la contraseña deseada
+            new_user = User(username=user_data['username'], email=user_data['email'], password=user_data['dni'])
+
+            student_role = Role.query.filter_by(name='STUDENT').first()
+            if student_role:
+                new_user.roles.append(student_role)
+
             db.session.add(new_user)
             db.session.flush()
 
             new_profile = UserProfile(
                 user_id=new_user.id,
-                name=nombre,
-                surname=apellido
+                name=user_data['nombre'],
+                surname=user_data['apellidos'],
+                dni=user_data['dni']
             )
             db.session.add(new_profile)
 
             db.session.commit()
 
-    return jsonify({'message': 'Usuarios creados correctamente'}), 201
+    flash('Usuarios creados correctamente', 'success')
+
+    return redirect(url_for('lecturer.users_manage'))
+

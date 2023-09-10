@@ -10,6 +10,7 @@
 
     {% set buttons = [{
         'name': 'Importar alumnos',
+        'icon': 'ki-duotone ki-update-file',
         'form_action': 'lecturer.upload_excel',
         'form_class': 'kt_modal_form',
         'form_id': 'kt_modal_add_customer_form',
@@ -18,7 +19,7 @@
         'form_body': '''
             <div class="fv-row mb-7">
                 <label class="required fs-6 fw-semibold mb-2">Seleccionar archivo Excel</label>
-                <input type="file" class="form-control form-control-solid" name="excel_file" accept=".xlsx, .xls"/>
+                <input type="file" class="form-control form-control-solid" name="file" accept=".xlsx, .xls"/>
             </div>
         '''
     },

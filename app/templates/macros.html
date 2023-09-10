@@ -187,8 +187,19 @@
                     {% for btn in buttons_config %}
 
                         {% set modal_id = 'custom_modal_' ~ loop.index %}  {# Generamos el ID del modal #}
+
                         <button type="button" class="btn btn-primary {% if not loop.last %}me-2{% endif %}"
                                 data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
+
+                            {% if btn.icon %}
+                                <i class="{{ btn.icon }} fs-2">
+                                    <i class="path1"></i>
+                                    <i class="path2"></i>
+                                    <i class="path3"></i>
+                                    <i class="path4"></i>
+                                </i>
+                            {% endif %}
+
                             {{ btn.name }}
                         </button>
 
@@ -251,9 +262,10 @@
                             Eliminar seleccionados
                         </button>
 
-                        {%  else %}
+                    {% else %}
 
-                        <button type="button" class="btn btn-danger" style="display:none" data-kt-customer-table-select="delete_selected"
+                        <button type="button" class="btn btn-danger" style="display:none"
+                                data-kt-customer-table-select="delete_selected"
                                 data-kt-delete-route-bulk="">
                         </button>
 

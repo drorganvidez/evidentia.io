@@ -13,7 +13,12 @@ def login():
         return redirect(url_for('dashboard.index'))
     form = LoginForm()
     if form.validate_on_submit():
+        # Intenta buscar al usuario por correo electrónico
         user = User.get_by_email(form.email.data)
+
+        # Si no se encuentra por correo electrónico, intenta buscar por nombre de usuario
+        if user is None:
+            user = User.get_by_username(form.email.data)
 
         if user is not None and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
