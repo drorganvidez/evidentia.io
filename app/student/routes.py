@@ -4,6 +4,7 @@ from flask_login import login_required
 from . import student_bp
 from .. import db
 from ..auth.models import User
+from ..services import delete_entity, delete_entity_bulk
 
 logger = logging.getLogger(__name__)
 
@@ -31,24 +32,27 @@ def edit(id):
 
 @student_bp.route('/student/delete', methods=['POST'])
 def delete():
-    try:
+    user_id = request.form.get('id')
 
-        user_id = request.form.get('id')
+    if not user_id:
+        return jsonify({"message": "ID is required"}), 400
 
-        if not user_id:
-            return jsonify({"message": "ID is required"}), 400
+    result, status_code = delete_entity(User, user_id)
 
-        user = User.query.get(user_id)
+    return jsonify(result), status_code
 
-        if not user:
-            return jsonify({"message": "User not found"}), 404
 
-        db.session.delete(user)
-        db.session.commit()
+@student_bp.route('/student/delete/bulk', methods=['POST'])
+def delete_bulk():
+    data = request.get_json()
+    bulk_ids = data.get("bulkIds", "").split(",")
 
-        return jsonify({"message": "User deleted successfully"}), 200
+    if not bulk_ids:
+        return jsonify({"message": "No IDs provided"}), 400
 
-    except Exception as e:
-        from .. import app
-        app.logger.error(f"Error deleting user: {str(e)}")
-        return jsonify({"message": f"Error: {str(e)}"}), 500
+    result, status_code = delete_entity_bulk(User, bulk_ids)
+
+    if status_code == 404:
+        return jsonify({"message": "No users found with provided IDs"}), status_code
+
+    return jsonify(result), status_code

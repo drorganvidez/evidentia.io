@@ -201,10 +201,21 @@ var KTCustomersList = function () {
         });
 
         // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
+        deleteSelected.addEventListener('click', function (e) {
+
+            // Get delete route
+            const deleteRoute = e.target.getAttribute("data-kt-delete-route-bulk");
+
+            var checkedValues = [];
+            $(".checkbox-element:checked").each(function () {
+                checkedValues.push($(this).val());
+            });
+
+            var valuesString = checkedValues.join(',');
+
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
             Swal.fire({
-                text: "¿Estás seguro/a que deseas eliminar los elementos seleccionados!",
+                text: "¿Estás seguro/a que deseas eliminar los elementos seleccionados?",
                 icon: "warning",
                 showCancelButton: true,
                 buttonsStyling: false,
@@ -216,37 +227,60 @@ var KTCustomersList = function () {
                 }
             }).then(function (result) {
                 if (result.value) {
-                    Swal.fire({
-                        text: "Los elementos seleccionados fueron eliminados",
-                        icon: "success",
-                        buttonsStyling: false,
-                        confirmButtonText: "Aceptar",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    }).then(function () {
-                        // Remove all selected customers
-                        checkboxes.forEach(c => {
-                            if (c.checked) {
-                                datatable.row($(c.closest('tbody tr'))).remove().draw();
-                            }
-                        });
+                    const data = {
+                        bulkIds: valuesString
+                    };
 
-                        // Remove header checked box
-                        const headerCheckbox = table.querySelectorAll('[type="checkbox"]')[0];
-                        headerCheckbox.checked = false;
-                    });
-                } else if (result.dismiss === 'cancel') {
-                    Swal.fire({
-                        text: "Los elementos seleccionados no fueron eliminados",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Aceptar",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
+                    fetch(deleteRoute, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error en la solicitud al servidor');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log(data);
+                            Swal.fire({
+                                text: "Los elementos seleccionados fueron eliminados",
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Aceptar",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary",
+                                }
+                            }).then(function () {
+                                // Remove all selected customers
+                                checkboxes.forEach(c => {
+                                    if (c.checked) {
+                                        datatable.row($(c.closest('tbody tr'))).remove().draw();
+                                    }
+                                });
+
+                                // Remove header checked box
+                                const headerCheckbox = table.querySelectorAll('[type="checkbox"]')[0];
+                                headerCheckbox.checked = false;
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error en la solicitud:', error);
+                            Swal.fire({
+                                text: "Hubo un error al eliminar los elementos seleccionados",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Aceptar",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary",
+                                }
+                            });
+                        });
                 }
+
             });
         });
     }
