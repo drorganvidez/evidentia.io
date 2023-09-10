@@ -9,6 +9,7 @@ from app import db
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
 
+    username = db.Column(db.String(256), unique=True, nullable=False)
     email = db.Column(db.String(256), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -24,8 +25,9 @@ class User(db.Model, UserMixin):
     reviewer = db.relationship('Reviewer', backref='user', uselist=False, cascade="all, delete-orphan")
     lectures = db.relationship('Lecturer', backref='user', uselist=False, cascade="all, delete-orphan")
 
-    def __init__(self, email, password, **kwargs):
+    def __init__(self, username, email, password, **kwargs):
         super().__init__(**kwargs)
+        self.username = username
         self.email = email
         self.password = generate_password_hash(password)
 

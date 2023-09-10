@@ -195,7 +195,7 @@
                         <div class="modal fade kt_modal" id="{{ modal_id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered mw-650px">
                                 <div class="modal-content">
-                                    <form class="form {{ btn.form_class }}" action="{{ btn.form_action }}"
+                                    <form class="form {{ btn.form_class }}" action="{{ url_for(btn.form_action) }}"
                                           id="{{ btn.form_id }}" method="post"
                                             {% if btn.is_multipart %} enctype="multipart/form-data" {% endif %}>
 
