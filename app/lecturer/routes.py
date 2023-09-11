@@ -57,7 +57,17 @@ def edit_role_users(role_id):
     if request.method == "POST":
         return redirect(url_for("lecturer_bp.view_role", role_id=role.id))
 
-    return render_template("lecturer/users/edit_role_users.html", role=role)
+    users = role.get_users_by_role()
+
+    data_collection = [{
+        'id': user.id,
+        'Email': user.email,
+        'Apellidos': user.surname(),
+        'Nombre': user.name(),
+        'Unido el': user.get_role_creation_time(role.id)
+    } for user in users]
+
+    return render_template("lecturer/users/edit_role_users.html", role=role, data_collection=data_collection)
 
 
 @lecturer_bp.route("/lecturer/users/upload", methods=['POST'])

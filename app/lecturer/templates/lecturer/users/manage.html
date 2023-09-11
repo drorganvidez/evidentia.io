@@ -25,14 +25,14 @@
     },
     ] %}
 
-    {% set menu_routes = {
-        "view": 'student.view',
-        "edit": "student.edit",
-        "delete": "student.delete",
-        "delete_bulk": "student.delete_bulk"
-        } %}
+    {% set menu_actions = [
+        {"name": "Ver", "route": 'student.view'},
+        {"name": "Editar", "route": "student.edit"},
+        {"name": "Eliminar", "route": "student.delete", "special": True, "delete": True},
+        {"name": "Eliminar seleccionados", "route": "student.delete_bulk", "special": True, "delete_bulk": True},
+    ] %}
 
-    {{ macros.render_table(columns, data_collection, buttons, menu_routes) }}
+    {{ macros.render_table(columns, data_collection, buttons, menu_actions) }}
 
 
 {% endblock %}

@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from flask_login import UserMixin
+from sqlalchemy import select, column
+from sqlalchemy.orm import aliased
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
@@ -36,6 +38,21 @@ class User(db.Model, UserMixin):
 
     def surname(self):
         return self.profile.surname if self.profile else None
+
+    def get_role_creation_time(self, role_id):
+        """ Returns the creation time when the role was assigned to the user. """
+
+        # Create an alias for the user_roles table
+        user_roles_alias = aliased(user_roles)
+
+        # Query the user_roles table using the alias
+        relation = db.session.query(user_roles_alias).filter(
+            user_roles_alias.c.user_id == self.id,
+            user_roles_alias.c.role_id == role_id
+        ).first()
+
+        # Return the created_at attribute if the relation exists
+        return relation.created_at if relation else None
 
     @property
     def current_roles(self):
@@ -126,7 +143,8 @@ class Role(db.Model):
 
 user_roles = db.Table('user_roles',
                       db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-                      db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
+                      db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True),
+                      db.Column('created_at', db.DateTime, default=datetime.utcnow)
                       )
 
 
