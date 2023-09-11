@@ -35,7 +35,29 @@ def users_manage():
 def users_roles():
     logger.info('Access lecturer index')
 
-    return render_template("lecturer/users/roles.html")
+    all_roles = Role.query.order_by(Role.name).all()
+
+    roles_with_user_count = {}
+
+    for role in all_roles:
+        users = role.get_users_by_role()
+        user_count = len(users)
+        roles_with_user_count[role] = user_count
+
+    return render_template("lecturer/users/roles.html", roles_with_user_count=roles_with_user_count)
+
+
+@lecturer_bp.route("/lecturer/users/roles/<int:role_id>", methods=["GET", "POST"])
+@login_required
+def edit_role_users(role_id):
+    logger.info('Edit role users')
+
+    role = Role.query.get_or_404(role_id)
+
+    if request.method == "POST":
+        return redirect(url_for("lecturer_bp.view_role", role_id=role.id))
+
+    return render_template("lecturer/users/edit_role_users.html", role=role)
 
 
 @lecturer_bp.route("/lecturer/users/upload", methods=['POST'])

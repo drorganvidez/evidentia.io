@@ -99,10 +99,29 @@ class Role(db.Model):
     VALID_ROLES = ['STUDENT', 'COORDINATOR', 'SECRETARY', 'REVIEWER', 'EVENT_MANAGER', 'LECTURER', 'DEVELOPER',
                    'PRESIDENT']
 
+    ROLES_MAPPING = {
+        'STUDENT': 'Estudiante',
+        'COORDINATOR': 'Coordinador',
+        'SECRETARY': 'Secretario',
+        'REVIEWER': 'Revisor',
+        'EVENT_MANAGER': 'Manager de Eventos',
+        'LECTURER': 'Profesor',
+        'DEVELOPER': 'Desarrollador',
+        'PRESIDENT': 'Presidente'
+    }
+
     def __init__(self, name):
         if name not in self.VALID_ROLES:
             raise ValueError(f"The role '{name}' is not valid.")
         self.name = name
+
+    def get_users_by_role(self):
+        users = User.query.join(user_roles).filter(user_roles.c.role_id == self.id).all()
+        return users
+
+    @property
+    def name_in_spanish(self):
+        return self.ROLES_MAPPING.get(self.name, self.name)
 
 
 user_roles = db.Table('user_roles',
