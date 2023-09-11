@@ -23,7 +23,7 @@ class User(db.Model, UserMixin):
     secretary = db.relationship('Secretary', backref='user', uselist=False, cascade="all, delete-orphan")
     event_manager = db.relationship('EventManager', backref='user', uselist=False, cascade="all, delete-orphan")
     reviewer = db.relationship('Reviewer', backref='user', uselist=False, cascade="all, delete-orphan")
-    lectures = db.relationship('Lecturer', backref='user', uselist=False, cascade="all, delete-orphan")
+    lecture = db.relationship('Lecturer', backref='user', uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, username, email, password, **kwargs):
         super().__init__(**kwargs)
@@ -96,7 +96,8 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
 
-    VALID_ROLES = ['STUDENT', 'COORDINATOR', 'SECRETARY', 'REVIEWER', 'EVENT_MANAGER', 'LECTURER', 'DEVELOPER']
+    VALID_ROLES = ['STUDENT', 'COORDINATOR', 'SECRETARY', 'REVIEWER', 'EVENT_MANAGER', 'LECTURER', 'DEVELOPER',
+                   'PRESIDENT']
 
     def __init__(self, name):
         if name not in self.VALID_ROLES:
@@ -136,5 +137,10 @@ class Reviewer(db.Model):
 
 
 class Lecturer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+
+class President(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
