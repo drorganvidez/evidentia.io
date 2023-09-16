@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_login import UserMixin
-from sqlalchemy import select, column
+from sqlalchemy import select, column, DateTime
 from sqlalchemy.orm import aliased
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -112,6 +112,9 @@ class User(db.Model, UserMixin):
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
+
+    created_at = db.Column(DateTime, default=datetime.utcnow)
+    updated_at = db.Column(DateTime, default=datetime.utcnow)
 
     VALID_ROLES = ['STUDENT', 'COORDINATOR', 'SECRETARY', 'REVIEWER', 'EVENT_MANAGER', 'LECTURER', 'DEVELOPER',
                    'PRESIDENT']
